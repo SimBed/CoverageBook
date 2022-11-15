@@ -1,18 +1,24 @@
 # class to calculate students' Grade Point Averages
+# Input requirements are strict. Grades must be input as an array of strings
 class Calculator
   attr_reader :name, :grades
 
   def initialize(name, grades)
     @name = name
     @grades = grades
+    @gpa = gpa
   end
 
   def gpa
     (grades_to_numbers.sum / courses_taken).round(1)
+  rescue TypeError, ZeroDivisionError, NoMethodError
+    nil
   end
 
   def announcement
-    "#{name} scored an average of #{gpa}"
+    return 'error in input' if @gpa.nil?
+
+    "#{name} scored an average of #{@gpa}"
   end
 
   private
@@ -55,6 +61,16 @@ tests = [
 #   { in: { name: 'Numbers',  grades: [1, 2] } },
 #   { in: { name: 'Passed a string',  grades: "A A-" } },
 # ]
+
+extra_tests = [
+  { in: { name: 'Non-grades',  grades: ['N'] }, out: { gpa: nil, announcement: 'error in input' } },
+  { in: { name: 'Non-strings',  grades: ['A', :B] }, out: { gpa: nil, announcement: 'error in input' } },
+  { in: { name: 'Empty',  grades: [] }, out: { gpa: nil, announcement: 'error in input' } },
+  { in: { name: 'Numbers',  grades: [1, 2] }, out: { gpa: nil, announcement: 'error in input' } },
+  { in: { name: 'Passed a string',  grades: 'A A-' }, out: { gpa: nil, announcement: 'error in input' } }
+]
+
+tests += extra_tests
 
 tests.each do |test|
   user = Calculator.new(test[:in][:name], test[:in][:grades])
